@@ -5,10 +5,13 @@ A minimal, end-to-end data analytics project demonstrating CSV upload, data anal
 ---
 
 ## 🚀 Project Goal
-- Upload a CSV dataset.
-- Perform basic validation and preprocessing.
-- Compute summary statistics and simple visualizations.
-- Provide a user-friendly interface for interactive exploration.
+- Upload a CSV dataset with automatic encoding detection.
+- Perform validation (file size, format, encoding).
+- Compute comprehensive summary statistics:
+  - **Numerical columns**: mean, median, standard deviation
+  - **Categorical columns**: top 5 most frequent values
+  - **All columns**: null value counts and data types
+- Provide a user-friendly Streamlit interface for data exploration.
 - Deploy to Azure cloud for easy sharing and demonstration.
 
 ---
@@ -17,24 +20,56 @@ A minimal, end-to-end data analytics project demonstrating CSV upload, data anal
 
 quick-dataset-analyzer/
 │
-├── README.md # Project overview
+├── README.md # Project overview and documentation
 ├── requirements.txt # Python dependencies
-├── Dockerfile # Containerization for Azure
+├── LICENSE # MIT License
+├── .gitignore # Git ignore rules
 ├── src/ # Source code
-│ ├── app.py # Streamlit main app
-│ ├── data_pipeline.py # CSV loading & preprocessing
-│ ├── analysis.py # Statistics & visualizations
-│ └── utils.py # Helper functions
-├── tests/ # Unit and integration tests
-├── docs/ # Documentation (Project Charter, Architecture, Usage)
-└── data/ # Sample CSV files (gitignored)
+│ ├── app.py # Streamlit web application
+│ └── data_pipeline.py # Data loading, validation, and statistics
+├── tests/ # Unit tests
+│ └── test_pipeline.py # Comprehensive test suite
+├── docs/ # Documentation
+│ └── ProjectCharter.md # PRINCE2 project charter
+└── data/ # Sample data directory (gitignored)
 
 ---
 
+## ✨ Features
+
+- **CSV Upload**: Support for CSV files with automatic encoding detection
+- **Data Validation**: File size limits (5MB), format validation, and error handling
+- **Summary Statistics**:
+  - Numerical columns: mean, median, standard deviation
+  - Categorical columns: top 5 value frequencies
+  - All columns: null counts and data type information
+- **Interactive UI**: Clean Streamlit interface with expandable sections
+- **Comprehensive Testing**: Unit tests covering all functionality
+- **Production Ready**: Containerized with Docker for easy deployment
+
 ## ⚙️ Installation
 
-1. Clone the repo:
-git clone https://github.com/davy-benoot/quick-dataset-analyzer.git
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/davy-benoot/quick-dataset-analyzer.git
+   cd quick-dataset-analyzer
+   ```
+
+2. Create a virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the application:
+   ```bash
+   streamlit run src/app.py
+   ```
 
 ## ☁️ Deployment
 

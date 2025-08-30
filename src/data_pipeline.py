@@ -49,3 +49,51 @@ def load_and_validate_csv(file, max_size_mb=5):
         raise ValueError("CSV is empty")
 
     return df
+
+def compute_summary_statistics(df):
+    """
+    Compute summary statistics for the dataset.
+
+    Returns a dictionary with:
+    - numerical_stats: dict of column -> {mean, median, std}
+    - categorical_stats: dict of column -> {value: count} for top 5 values
+    - null_counts: dict of column -> null count
+    - data_types: dict of column -> dtype
+    """
+    if df.empty:
+        return {
+            'numerical_stats': {},
+            'categorical_stats': {},
+            'null_counts': {},
+            'data_types': {}
+        }
+
+    numerical_stats = {}
+    categorical_stats = {}
+    null_counts = {}
+    data_types = {}
+
+    for col in df.columns:
+        data_types[col] = str(df[col].dtype)
+        null_counts[col] = df[col].isnull().sum()
+
+        # Numerical columns
+        if df[col].dtype in ['int64', 'float64']:
+            if not df[col].isnull().all():  # Skip if all values are null
+                numerical_stats[col] = {
+                    'mean': df[col].mean(),
+                    'median': df[col].median(),
+                    'std': df[col].std()
+                }
+        # Categorical columns (object/string)
+        elif df[col].dtype == 'object':
+            if not df[col].isnull().all():
+                value_counts = df[col].value_counts().head(5)
+                categorical_stats[col] = value_counts.to_dict()
+
+    return {
+        'numerical_stats': numerical_stats,
+        'categorical_stats': categorical_stats,
+        'null_counts': null_counts,
+        'data_types': data_types
+    }
