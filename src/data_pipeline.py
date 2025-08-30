@@ -1,9 +1,14 @@
 import pandas as pd
 import chardet
 
-def detect_encoding(file_path):
-    with open(file_path, 'rb') as f:
-        result = chardet.detect(f.read())
+def detect_encoding(file_or_path):
+    if isinstance(file_or_path, str):
+        with open(file_or_path, 'rb') as f:
+            data = f.read()
+    else:
+        data = file_or_path.read()
+        file_or_path.seek(0)
+    result = chardet.detect(data)
     return result['encoding']
 
 def load_dataset(file_path):
@@ -12,7 +17,7 @@ def load_dataset(file_path):
         if file_path.endswith('.csv'):
             df = pd.read_csv(file_path, encoding=encoding)
         else:
-            raise ValueError("Unsupported file format. Please upload a CSV or Excel file.")
+            raise ValueError("Unsupported file format. Please upload a CSV file.")
     except Exception as e:
         raise ValueError(f"Error loading dataset: {e}")
     return df
