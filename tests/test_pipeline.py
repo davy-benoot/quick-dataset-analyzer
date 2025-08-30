@@ -3,6 +3,11 @@ import pandas as pd
 import pytest
 import tempfile
 import os
+import sys
+
+# Add the src directory to the Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from src.data_pipeline import detect_encoding, load_dataset, load_and_validate_csv
 
 def test_detect_encoding_with_path(tmp_path):
