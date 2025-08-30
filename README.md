@@ -11,7 +11,11 @@ A minimal, end-to-end data analytics project demonstrating CSV upload, data anal
   - **Numerical columns**: mean, median, standard deviation
   - **Categorical columns**: top 5 most frequent values
   - **All columns**: null value counts and data types
-- Provide a user-friendly Streamlit interface for data exploration.
+- **Generate interactive data visualizations**:
+  - Correlation heatmaps for variable relationships
+  - Histograms and boxplots for distribution analysis
+  - Per-column detailed visualizations
+- Provide a user-friendly Streamlit interface for data exploration and visualization.
 - Deploy to Azure cloud for easy sharing and demonstration.
 
 ---
@@ -44,7 +48,12 @@ quick-dataset-analyzer/
   - Numerical columns: mean, median, standard deviation
   - Categorical columns: top 5 value frequencies
   - All columns: null counts and data type information
-- **Interactive UI**: Clean Streamlit interface with expandable sections
+- **Data Visualizations**:
+  - **Correlation Heatmap**: Shows relationships between all numerical variables
+  - **Interactive Histograms**: Distribution plots for individual numerical columns
+  - **Boxplots**: Statistical summary plots with quartiles and outlier detection
+  - **Per-Column Analysis**: Select specific columns for detailed visualization
+- **Interactive UI**: Clean Streamlit interface with expandable sections and dynamic visualizations
 - **Comprehensive Testing**: Unit tests covering all functionality
 - **Cloud Ready**: Optimized for containerized deployment with configurable limits
 

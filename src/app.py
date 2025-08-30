@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 import chardet
-from data_pipeline import load_and_validate_csv, compute_summary_statistics, get_max_file_size_mb
+from data_pipeline import (load_and_validate_csv, compute_summary_statistics, get_max_file_size_mb,
+                          get_numerical_columns, generate_correlation_heatmap,
+                          generate_histogram, generate_boxplot)
 
 st.title("Quick Dataset Analyzer")
 
@@ -10,8 +12,7 @@ max_size_mb = get_max_file_size_mb()
 
 uploaded_file = st.file_uploader(
     f"Choose a CSV file (max {max_size_mb}MB)",
-    type="csv",
-    max_upload_size_mb=max_size_mb
+    type="csv"
 )
 
 if uploaded_file is not None:
@@ -65,6 +66,69 @@ if uploaded_file is not None:
         st.subheader("Column Data Types")
         dtype_df = pd.DataFrame(list(stats['data_types'].items()), columns=['Column', 'Data Type'])
         st.dataframe(dtype_df)
+
+        # Data Visualizations
+        st.header("📊 Data Visualizations")
+
+        # Correlation Heatmap (always visible on main screen)
+        st.subheader("Correlation Heatmap")
+        heatmap_fig = generate_correlation_heatmap(df)
+        if heatmap_fig:
+            st.pyplot(heatmap_fig)
+        else:
+            numerical_cols = get_numerical_columns(df)
+            if len(numerical_cols) == 1:
+                st.info("Need at least 2 numerical columns to generate correlation heatmap. Only found: " + ", ".join(numerical_cols))
+            else:
+                st.info("No numerical columns found for correlation analysis.")
+
+        # Column selector for detailed visualizations
+        st.subheader("Detailed Column Visualizations")
+        numerical_cols = get_numerical_columns(df)
+
+        if numerical_cols:
+            selected_column = st.selectbox(
+                "Select a numerical column for detailed visualization:",
+                numerical_cols,
+                key="column_selector"
+            )
+
+            if st.button("Generate Visualizations", key="generate_viz"):
+                st.session_state.selected_column = selected_column
+                st.session_state.show_visualizations = True
+
+            # Display visualizations if button was clicked
+            if st.session_state.get('show_visualizations', False) and st.session_state.get('selected_column'):
+                col = st.session_state.selected_column
+
+                st.markdown("---")
+                st.subheader(f"📈 Visualizations for: {col}")
+
+                # Create two columns for histogram and boxplot
+                viz_col1, viz_col2 = st.columns(2)
+
+                with viz_col1:
+                    st.markdown("**Distribution Histogram**")
+                    hist_fig = generate_histogram(df, col)
+                    if hist_fig:
+                        st.pyplot(hist_fig)
+                    else:
+                        st.error(f"Could not generate histogram for {col}")
+
+                with viz_col2:
+                    st.markdown("**Boxplot**")
+                    box_fig = generate_boxplot(df, col)
+                    if box_fig:
+                        st.pyplot(box_fig)
+                    else:
+                        st.error(f"Could not generate boxplot for {col}")
+
+                # Add option to select different column
+                if st.button("Select Different Column", key="change_column"):
+                    st.session_state.show_visualizations = False
+                    st.rerun()
+        else:
+            st.info("No numerical columns found for visualization.")
 
     except UnicodeDecodeError as e:
         st.error(f"Encoding error: Unable to decode the file. Error: {str(e)}")

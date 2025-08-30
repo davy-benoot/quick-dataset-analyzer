@@ -2,3 +2,5 @@ pandas
 chardet
 pytest
 streamlit
+matplotlib
+seaborn

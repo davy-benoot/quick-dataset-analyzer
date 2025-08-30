@@ -1,6 +1,9 @@
 import pandas as pd
 import chardet
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+import io
 
 def get_max_file_size_mb():
     """
@@ -119,3 +122,147 @@ def compute_summary_statistics(df):
         'null_counts': null_counts,
         'data_types': data_types
     }
+
+def get_numerical_columns(df):
+    """
+    Get list of numerical columns from DataFrame.
+
+    Args:
+        df: pandas DataFrame
+
+    Returns:
+        list: List of numerical column names
+    """
+    return [col for col in df.columns if df[col].dtype in ['int64', 'float64']]
+
+def generate_correlation_heatmap(df):
+    """
+    Generate correlation heatmap for numerical columns.
+
+    Args:
+        df: pandas DataFrame
+
+    Returns:
+        matplotlib.figure.Figure: Correlation heatmap figure
+    """
+    numerical_cols = get_numerical_columns(df)
+
+    if len(numerical_cols) < 2:
+        return None  # Need at least 2 numerical columns for correlation
+
+    # Calculate correlation matrix
+    corr_matrix = df[numerical_cols].corr()
+
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Generate heatmap
+    sns.heatmap(corr_matrix,
+                annot=True,
+                cmap='coolwarm',
+                center=0,
+                square=True,
+                linewidths=0.5,
+                cbar_kws={"shrink": 0.8},
+                ax=ax)
+
+    ax.set_title('Correlation Heatmap of Numerical Variables', fontsize=14, pad=20)
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+
+    return fig
+
+def generate_histogram(df, column):
+    """
+    Generate histogram for a specific numerical column.
+
+    Args:
+        df: pandas DataFrame
+        column: Column name to plot
+
+    Returns:
+        matplotlib.figure.Figure: Histogram figure
+    """
+    if column not in df.columns or df[column].dtype not in ['int64', 'float64']:
+        return None
+
+    # Remove null values for plotting
+    data = df[column].dropna()
+
+    if data.empty:
+        return None
+
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Generate histogram
+    n, bins, patches = ax.hist(data, bins=30, alpha=0.7, edgecolor='black')
+
+    # Add styling
+    ax.set_title(f'Distribution of {column}', fontsize=14, pad=20)
+    ax.set_xlabel(column, fontsize=12)
+    ax.set_ylabel('Frequency', fontsize=12)
+    ax.grid(True, alpha=0.3)
+
+    # Add statistics as text
+    mean_val = data.mean()
+    median_val = data.median()
+    std_val = data.std()
+
+    stats_text = '.2f'
+    ax.text(0.02, 0.98, stats_text,
+            transform=ax.transAxes, verticalalignment='top',
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+
+    plt.tight_layout()
+
+    return fig
+
+def generate_boxplot(df, column):
+    """
+    Generate boxplot for a specific numerical column.
+
+    Args:
+        df: pandas DataFrame
+        column: Column name to plot
+
+    Returns:
+        matplotlib.figure.Figure: Boxplot figure
+    """
+    if column not in df.columns or df[column].dtype not in ['int64', 'float64']:
+        return None
+
+    # Remove null values for plotting
+    data = df[column].dropna()
+
+    if data.empty:
+        return None
+
+    # Create figure
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Generate boxplot
+    bp = ax.boxplot(data, patch_artist=True, notch=True)
+
+    # Styling
+    bp['boxes'][0].set_facecolor('lightblue')
+    bp['boxes'][0].set_edgecolor('black')
+    bp['medians'][0].set_color('red')
+    bp['medians'][0].set_linewidth(2)
+
+    # Add styling
+    ax.set_title(f'Boxplot of {column}', fontsize=14, pad=20)
+    ax.set_ylabel(column, fontsize=12)
+    ax.grid(True, alpha=0.3, axis='y')
+
+    # Add statistics
+    stats = data.describe()
+    stats_text = '.2f'
+    ax.text(0.02, 0.98, stats_text,
+            transform=ax.transAxes, verticalalignment='top',
+            bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+
+    plt.tight_layout()
+
+    return fig
