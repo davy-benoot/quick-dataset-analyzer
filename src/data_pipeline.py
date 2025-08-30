@@ -1,5 +1,19 @@
 import pandas as pd
 import chardet
+import os
+
+def get_max_file_size_mb():
+    """
+    Get configurable maximum file size from environment variable.
+
+    Returns:
+        int: Maximum file size in MB (default: 5)
+    """
+    default = 5  # MB
+    try:
+        return int(os.getenv('MAX_FILE_SIZE_MB', default))
+    except ValueError:
+        return default
 
 def detect_encoding(file_or_path):
     if isinstance(file_or_path, str):
@@ -22,13 +36,21 @@ def load_dataset(file_path):
         raise ValueError(f"Error loading dataset: {e}")
     return df
 
-def load_and_validate_csv(file, max_size_mb=5):
+def load_and_validate_csv(file, max_size_mb=None):
     """
     Load CSV with validation:
     - File type
     - Encoding
     - Size
+
+    Args:
+        file: File object to load
+        max_size_mb: Maximum file size in MB (optional, uses environment variable if not provided)
     """
+    # Use configurable max size if not provided
+    if max_size_mb is None:
+        max_size_mb = get_max_file_size_mb()
+
     # Check file size
     file.seek(0, 2)  # move to end
     size_mb = file.tell() / (1024 * 1024)

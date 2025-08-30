@@ -8,7 +8,7 @@ import sys
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src.data_pipeline import detect_encoding, load_dataset, load_and_validate_csv, compute_summary_statistics
+from src.data_pipeline import detect_encoding, load_dataset, load_and_validate_csv, compute_summary_statistics, get_max_file_size_mb
 
 def test_detect_encoding_with_path(tmp_path):
     # Create a temp file with known encoding
@@ -45,12 +45,44 @@ def test_load_and_validate_csv_valid():
     assert list(df.columns) == ['name', 'age']
     assert len(df) == 2
 
+def test_get_max_file_size_mb_default():
+    # Test default value when no environment variable is set
+    # Remove env var if it exists
+    if 'MAX_FILE_SIZE_MB' in os.environ:
+        del os.environ['MAX_FILE_SIZE_MB']
+    assert get_max_file_size_mb() == 5
+
+def test_get_max_file_size_mb_custom():
+    # Test custom value from environment variable
+    os.environ['MAX_FILE_SIZE_MB'] = '10'
+    try:
+        assert get_max_file_size_mb() == 10
+    finally:
+        # Clean up
+        del os.environ['MAX_FILE_SIZE_MB']
+
+def test_get_max_file_size_mb_invalid():
+    # Test invalid environment variable (should fallback to default)
+    os.environ['MAX_FILE_SIZE_MB'] = 'invalid'
+    try:
+        assert get_max_file_size_mb() == 5
+    finally:
+        # Clean up
+        del os.environ['MAX_FILE_SIZE_MB']
+
 def test_load_and_validate_csv_too_large():
-    # Create large data > 5MB
+    # Create large data > default 5MB limit
     large_data = b"a,b\n" + b"1,2\n" * 2000000  # approx 10MB
     file_obj = io.BytesIO(large_data)
     with pytest.raises(ValueError, match="File is too large"):
         load_and_validate_csv(file_obj)
+
+def test_load_and_validate_csv_custom_limit():
+    # Test with custom file size limit
+    large_data = b"a,b\n" + b"1,2\n" * 100000  # approx 1MB (under custom limit of 2MB)
+    file_obj = io.BytesIO(large_data)
+    df = load_and_validate_csv(file_obj, max_size_mb=2)
+    assert not df.empty
 
 def test_load_and_validate_csv_empty():
     data = b"name,age\n"

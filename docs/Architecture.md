@@ -57,12 +57,19 @@ The Quick Dataset Analyzer is a web-based application built with Streamlit that 
 - **Validation**: File format checking (.csv extension)
 - **Error Handling**: Comprehensive exception handling for file operations
 
-#### `load_and_validate_csv(file)`
-- **Input**: File object (from Streamlit upload)
+#### `get_max_file_size_mb()`
+- **Input**: None (reads from environment)
+- **Output**: Integer (file size limit in MB)
+- **Purpose**: Get configurable maximum file size from environment variable
+- **Default**: 5MB if environment variable not set
+- **Environment Variable**: `MAX_FILE_SIZE_MB`
+
+#### `load_and_validate_csv(file, max_size_mb=None)`
+- **Input**: File object (from Streamlit upload), optional max_size_mb
 - **Output**: Pandas DataFrame
 - **Purpose**: Complete CSV loading and validation pipeline
 - **Validations**:
-  - File size limit (5MB)
+  - File size limit (configurable, default 5MB)
   - Encoding detection
   - CSV parsing validation
   - Empty file detection

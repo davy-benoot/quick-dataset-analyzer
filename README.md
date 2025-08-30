@@ -38,14 +38,15 @@ quick-dataset-analyzer/
 ## ✨ Features
 
 - **CSV Upload**: Support for CSV files with automatic encoding detection
-- **Data Validation**: File size limits (5MB), format validation, and error handling
+- **Configurable File Size**: Environment-based file size limits (default 5MB)
+- **Data Validation**: Format validation, encoding detection, and error handling
 - **Summary Statistics**:
   - Numerical columns: mean, median, standard deviation
   - Categorical columns: top 5 value frequencies
   - All columns: null counts and data type information
 - **Interactive UI**: Clean Streamlit interface with expandable sections
 - **Comprehensive Testing**: Unit tests covering all functionality
-- **Production Ready**: Containerized with Docker for easy deployment
+- **Cloud Ready**: Optimized for containerized deployment with configurable limits
 
 ## ⚙️ Installation
 
@@ -66,7 +67,12 @@ quick-dataset-analyzer/
    pip install -r requirements.txt
    ```
 
-4. Run the application:
+4. (Optional) Configure file size limit:
+   ```bash
+   export MAX_FILE_SIZE_MB=10  # Set to 10MB instead of default 5MB
+   ```
+
+5. Run the application:
    ```bash
    streamlit run src/app.py
    ```

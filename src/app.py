@@ -1,11 +1,18 @@
 import streamlit as st
 import pandas as pd
 import chardet
-from data_pipeline import load_and_validate_csv, compute_summary_statistics
+from data_pipeline import load_and_validate_csv, compute_summary_statistics, get_max_file_size_mb
 
 st.title("Quick Dataset Analyzer")
 
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+# Get configurable max file size
+max_size_mb = get_max_file_size_mb()
+
+uploaded_file = st.file_uploader(
+    f"Choose a CSV file (max {max_size_mb}MB)",
+    type="csv",
+    max_upload_size_mb=max_size_mb
+)
 
 if uploaded_file is not None:
     try:

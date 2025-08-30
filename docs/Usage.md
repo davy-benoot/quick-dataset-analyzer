@@ -24,7 +24,7 @@
 
 The application accepts CSV files with the following validations:
 - **File Format**: Must be .csv extension
-- **File Size**: Maximum 5MB
+- **File Size**: Configurable maximum (default 5MB, set via `MAX_FILE_SIZE_MB` environment variable)
 - **Encoding**: Automatic detection (UTF-8, ISO-8859-1, etc.)
 - **Content**: Must contain valid CSV data
 
@@ -187,10 +187,30 @@ For issues or questions:
 3. Ensure your environment matches requirements
 4. Test with sample data to isolate issues
 
+## Configuration
+
+### Environment Variables
+
+The application supports the following environment variables for configuration:
+
+- **MAX_FILE_SIZE_MB**: Maximum file size limit in MB (default: 5)
+  ```bash
+  export MAX_FILE_SIZE_MB=10  # Allow files up to 10MB
+  ```
+
+### Docker Deployment
+
+When deploying with Docker, set environment variables in your docker-compose.yml or deployment configuration:
+
+```yaml
+environment:
+  - MAX_FILE_SIZE_MB=20
+```
+
 ## Version Information
 
 - **Current Version**: 1.0.0
 - **Python Version**: 3.7+
 - **Key Dependencies**: Streamlit, Pandas, chardet
-- **File Size Limit**: 5MB
+- **File Size Limit**: Configurable (default 5MB)
 - **Supported Formats**: CSV only
