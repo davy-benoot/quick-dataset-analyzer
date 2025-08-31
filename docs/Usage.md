@@ -10,7 +10,7 @@
 
 2. **Upload a CSV File**
    - Click "Choose a CSV file" or drag and drop a CSV file
-   - The app supports files up to 5MB in size
+   - File size limit is configurable (default 5MB, set via `MAX_FILE_SIZE_MB` environment variable)
    - Automatic encoding detection handles various file formats
 
 3. **View Results**
@@ -101,7 +101,7 @@ salary  55400.0  52000.0  9879.92
 The application provides clear error messages for common issues:
 
 ### File Upload Errors
-- **"File is too large"**: File exceeds 5MB limit
+- **"File is too large"**: File exceeds the configured size limit (default 5MB, set via `MAX_FILE_SIZE_MB`)
 - **"Encoding error"**: Unable to detect or decode file encoding
 - **"Parsing error"**: File is not a valid CSV format
 - **"CSV is empty"**: File contains no data
@@ -189,22 +189,38 @@ For issues or questions:
 
 ## Configuration
 
-### Environment Variables
+### Configuration Options
 
-The application supports the following environment variables for configuration:
+The application supports multiple ways to configure the file size limit:
 
-- **MAX_FILE_SIZE_MB**: Maximum file size limit in MB (default: 5)
+#### Environment Variables
+- **MAX_FILE_SIZE_MB**: Controls the application's validation limit (default: 5MB)
   ```bash
   export MAX_FILE_SIZE_MB=10  # Allow files up to 10MB
   ```
 
+#### Streamlit Configuration
+For the UI to match the actual limit, also configure Streamlit:
+
+**Local development** (`.streamlit/config.toml`):
+```toml
+[server]
+maxUploadSize = 10
+```
+
+**Cloud deployment** (environment variable):
+```bash
+export STREAMLIT_SERVER_MAX_UPLOAD_SIZE=10
+```
+
 ### Docker Deployment
 
-When deploying with Docker, set environment variables in your docker-compose.yml or deployment configuration:
+When deploying with Docker, set both environment variables:
 
 ```yaml
 environment:
   - MAX_FILE_SIZE_MB=20
+  - STREAMLIT_SERVER_MAX_UPLOAD_SIZE=20
 ```
 
 ## Version Information

@@ -81,6 +81,25 @@ quick-dataset-analyzer/
    export MAX_FILE_SIZE_MB=10  # Set to 10MB instead of default 5MB
    ```
 
+   **Note**: This environment variable controls the application's validation limit. For cloud deployments, you also need to update the Streamlit configuration:
+
+   **For local development:**
+   - Update `.streamlit/config.toml`:
+     ```toml
+     [server]
+     maxUploadSize = 10
+     ```
+
+   **For cloud deployments:**
+   - Set the environment variable `MAX_FILE_SIZE_MB`
+   - Ensure your deployment platform supports the file size (check memory and processing limits)
+
+   **Considerations for cloud deployments:**
+   - **Memory limits**: Larger files require more RAM for processing
+   - **Processing time**: Bigger datasets take longer to analyze
+   - **Cost optimization**: Balance user needs with cloud resource costs
+   - **Default**: 5MB (suitable for most small to medium datasets)
+
 5. Run the application:
    ```bash
    streamlit run src/app.py
