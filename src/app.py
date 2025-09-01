@@ -1,19 +1,22 @@
 import streamlit as st
 import pandas as pd
-import chardet
-from data_pipeline import (load_and_validate_csv, compute_summary_statistics, get_max_file_size_mb,
-                          get_numerical_columns, generate_correlation_heatmap,
-                          generate_histogram, generate_boxplot)
+from data_pipeline import (
+    load_and_validate_csv,
+    compute_summary_statistics,
+    get_max_file_size_mb,
+    get_numerical_columns,
+    generate_correlation_heatmap,
+    generate_histogram,
+    generate_boxplot,
+)
 
 st.title("Quick Dataset Analyzer")
 
 # Get configurable max file size
 max_size_mb = get_max_file_size_mb()
 
-uploaded_file = st.file_uploader(
-    f"Choose a CSV file (max {max_size_mb}MB)",
-    type="csv"
-)
+uploaded_file = st.file_uploader(f"Choose a CSV file (max {max_size_mb}MB)",
+                                 type="csv")
 
 if uploaded_file is not None:
     try:
@@ -36,27 +39,34 @@ if uploaded_file is not None:
         with col2:
             st.metric("Total Columns", len(df.columns))
         with col3:
-            st.metric("Total Null Values", sum(stats['null_counts'].values()))
+            st.metric("Total Null Values", sum(stats["null_counts"].values()))
 
         # Numerical Statistics
-        if stats['numerical_stats']:
+        if stats["numerical_stats"]:
             st.subheader("Numerical Columns Statistics")
-            num_stats_df = pd.DataFrame.from_dict(stats['numerical_stats'], orient='index')
+            num_stats_df = pd.DataFrame.from_dict(
+                stats["numerical_stats"], orient="index"
+            )
             num_stats_df = num_stats_df.round(2)
             st.dataframe(num_stats_df)
 
         # Categorical Statistics
-        if stats['categorical_stats']:
+        if stats["categorical_stats"]:
             st.subheader("Categorical Columns (Top 5 Values)")
-            for col, value_counts in stats['categorical_stats'].items():
+            for col, value_counts in stats["categorical_stats"].items():
                 with st.expander(f"📊 {col}"):
-                    cat_df = pd.DataFrame(list(value_counts.items()), columns=['Value', 'Count'])
+                    cat_df = pd.DataFrame(
+                        list(value_counts.items()), columns=["Value", "Count"]
+                    )
                     st.dataframe(cat_df)
 
         # Null Values Summary
         st.subheader("Null Values Summary")
-        null_df = pd.DataFrame(list(stats['null_counts'].items()), columns=['Column', 'Null Count'])
-        null_df = null_df[null_df['Null Count'] > 0]  # Only show columns with nulls
+        null_df = pd.DataFrame(
+            list(stats["null_counts"].items()),
+            columns=["Column", "Null Count"]
+        )
+        null_df = null_df[null_df["Null Count"] > 0]  # Only show columns with nulls
         if not null_df.empty:
             st.dataframe(null_df)
         else:
@@ -64,7 +74,9 @@ if uploaded_file is not None:
 
         # Data Types
         st.subheader("Column Data Types")
-        dtype_df = pd.DataFrame(list(stats['data_types'].items()), columns=['Column', 'Data Type'])
+        dtype_df = pd.DataFrame(
+            list(stats["data_types"].items()), columns=["Column", "Data Type"]
+        )
         st.dataframe(dtype_df)
 
         # Data Visualizations
@@ -78,7 +90,10 @@ if uploaded_file is not None:
         else:
             numerical_cols = get_numerical_columns(df)
             if len(numerical_cols) == 1:
-                st.info("Need at least 2 numerical columns to generate correlation heatmap. Only found: " + ", ".join(numerical_cols))
+                st.info(
+                    "Need at least 2 numerical columns to generate correlation heatmap. Only found: "
+                    + ", ".join(numerical_cols)
+                )
             else:
                 st.info("No numerical columns found for correlation analysis.")
 
@@ -90,7 +105,7 @@ if uploaded_file is not None:
             selected_column = st.selectbox(
                 "Select a numerical column for detailed visualization:",
                 numerical_cols,
-                key="column_selector"
+                key="column_selector",
             )
 
             if st.button("Generate Visualizations", key="generate_viz"):
@@ -98,7 +113,9 @@ if uploaded_file is not None:
                 st.session_state.show_visualizations = True
 
             # Display visualizations if button was clicked
-            if st.session_state.get('show_visualizations', False) and st.session_state.get('selected_column'):
+            if st.session_state.get(
+                "show_visualizations", False
+            ) and st.session_state.get("selected_column"):
                 col = st.session_state.selected_column
 
                 st.markdown("---")
@@ -133,7 +150,9 @@ if uploaded_file is not None:
     except UnicodeDecodeError as e:
         st.error(f"Encoding error: Unable to decode the file. Error: {str(e)}")
     except pd.errors.ParserError as e:
-        st.error(f"Parsing error: The file does not appear to be a valid CSV. Error: {str(e)}")
+        st.error(
+            f"Parsing error: The file does not appear to be a valid CSV. Error: {str(e)}"
+        )
     except Exception as e:
         st.error(f"An unexpected error occurred: {str(e)}")
 else:

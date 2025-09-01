@@ -3,7 +3,7 @@ import chardet
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-import io
+
 
 def get_max_file_size_mb():
     """
@@ -14,30 +14,33 @@ def get_max_file_size_mb():
     """
     default = 5  # MB
     try:
-        return int(os.getenv('MAX_FILE_SIZE_MB', default))
+        return int(os.getenv("MAX_FILE_SIZE_MB", default))
     except ValueError:
         return default
 
+
 def detect_encoding(file_or_path):
     if isinstance(file_or_path, str):
-        with open(file_or_path, 'rb') as f:
+        with open(file_or_path, "rb") as f:
             data = f.read()
     else:
         data = file_or_path.read()
         file_or_path.seek(0)
     result = chardet.detect(data)
-    return result['encoding']
+    return result["encoding"]
+
 
 def load_dataset(file_path):
     encoding = detect_encoding(file_path)
     try:
-        if file_path.endswith('.csv'):
+        if file_path.endswith(".csv"):
             df = pd.read_csv(file_path, encoding=encoding)
         else:
             raise ValueError("Unsupported file format. Please upload a CSV file.")
     except Exception as e:
         raise ValueError(f"Error loading dataset: {e}")
     return df
+
 
 def load_and_validate_csv(file, max_size_mb=None):
     """
@@ -59,7 +62,9 @@ def load_and_validate_csv(file, max_size_mb=None):
     size_mb = file.tell() / (1024 * 1024)
     file.seek(0)
     if size_mb > max_size_mb:
-        raise ValueError(f"File is too large ({size_mb:.2f} MB), max {max_size_mb} MB allowed.")
+        raise ValueError(
+            f"File is too large ({size_mb:.2f} MB), max {max_size_mb} MB allowed."
+        )
 
     # Detect encoding
     encoding = detect_encoding(file)
@@ -75,6 +80,7 @@ def load_and_validate_csv(file, max_size_mb=None):
 
     return df
 
+
 def compute_summary_statistics(df):
     """
     Compute summary statistics for the dataset.
@@ -87,10 +93,10 @@ def compute_summary_statistics(df):
     """
     if df.empty:
         return {
-            'numerical_stats': {},
-            'categorical_stats': {},
-            'null_counts': {},
-            'data_types': {}
+            "numerical_stats": {},
+            "categorical_stats": {},
+            "null_counts": {},
+            "data_types": {},
         }
 
     numerical_stats = {}
@@ -103,25 +109,26 @@ def compute_summary_statistics(df):
         null_counts[col] = df[col].isnull().sum()
 
         # Numerical columns
-        if df[col].dtype in ['int64', 'float64']:
+        if df[col].dtype in ["int64", "float64"]:
             if not df[col].isnull().all():  # Skip if all values are null
                 numerical_stats[col] = {
-                    'mean': df[col].mean(),
-                    'median': df[col].median(),
-                    'std': df[col].std()
+                    "mean": df[col].mean(),
+                    "median": df[col].median(),
+                    "std": df[col].std(),
                 }
         # Categorical columns (object/string)
-        elif df[col].dtype == 'object':
+        elif df[col].dtype == "object":
             if not df[col].isnull().all():
                 value_counts = df[col].value_counts().head(5)
                 categorical_stats[col] = value_counts.to_dict()
 
     return {
-        'numerical_stats': numerical_stats,
-        'categorical_stats': categorical_stats,
-        'null_counts': null_counts,
-        'data_types': data_types
+        "numerical_stats": numerical_stats,
+        "categorical_stats": categorical_stats,
+        "null_counts": null_counts,
+        "data_types": data_types,
     }
+
 
 def get_numerical_columns(df):
     """
@@ -133,7 +140,8 @@ def get_numerical_columns(df):
     Returns:
         list: List of numerical column names
     """
-    return [col for col in df.columns if df[col].dtype in ['int64', 'float64']]
+    return [col for col in df.columns if df[col].dtype in ["int64", "float64"]]
+
 
 def generate_correlation_heatmap(df):
     """
@@ -157,21 +165,24 @@ def generate_correlation_heatmap(df):
     fig, ax = plt.subplots(figsize=(10, 8))
 
     # Generate heatmap
-    sns.heatmap(corr_matrix,
-                annot=True,
-                cmap='coolwarm',
-                center=0,
-                square=True,
-                linewidths=0.5,
-                cbar_kws={"shrink": 0.8},
-                ax=ax)
+    sns.heatmap(
+        corr_matrix,
+        annot=True,
+        cmap="coolwarm",
+        center=0,
+        square=True,
+        linewidths=0.5,
+        cbar_kws={"shrink": 0.8},
+        ax=ax,
+    )
 
-    ax.set_title('Correlation Heatmap of Numerical Variables', fontsize=14, pad=20)
-    plt.xticks(rotation=45, ha='right')
+    ax.set_title("Correlation Heatmap of Numerical Variables", fontsize=14, pad=20)
+    plt.xticks(rotation=45, ha="right")
     plt.yticks(rotation=0)
     plt.tight_layout()
 
     return fig
+
 
 def generate_histogram(df, column):
     """
@@ -184,7 +195,7 @@ def generate_histogram(df, column):
     Returns:
         matplotlib.figure.Figure: Histogram figure
     """
-    if column not in df.columns or df[column].dtype not in ['int64', 'float64']:
+    if column not in df.columns or df[column].dtype not in ["int64", "float64"]:
         return None
 
     # Remove null values for plotting
@@ -197,12 +208,12 @@ def generate_histogram(df, column):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Generate histogram
-    n, bins, patches = ax.hist(data, bins=30, alpha=0.7, edgecolor='black')
+    n, bins, patches = ax.hist(data, bins=30, alpha=0.7, edgecolor="black")
 
     # Add styling
-    ax.set_title(f'Distribution of {column}', fontsize=14, pad=20)
+    ax.set_title(f"Distribution of {column}", fontsize=14, pad=20)
     ax.set_xlabel(column, fontsize=12)
-    ax.set_ylabel('Frequency', fontsize=12)
+    ax.set_ylabel("Frequency", fontsize=12)
     ax.grid(True, alpha=0.3)
 
     # Add statistics as text
@@ -210,14 +221,20 @@ def generate_histogram(df, column):
     median_val = data.median()
     std_val = data.std()
 
-    stats_text = '.2f'
-    ax.text(0.02, 0.98, stats_text,
-            transform=ax.transAxes, verticalalignment='top',
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    stats_text = f"Mean: {mean_val:.2f}\nMedian: {median_val:.2f}\nStd: {std_val:.2f}"
+    ax.text(
+        0.02,
+        0.98,
+        stats_text,
+        transform=ax.transAxes,
+        verticalalignment="top",
+        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.8),
+    )
 
     plt.tight_layout()
 
     return fig
+
 
 def generate_boxplot(df, column):
     """
@@ -230,7 +247,7 @@ def generate_boxplot(df, column):
     Returns:
         matplotlib.figure.Figure: Boxplot figure
     """
-    if column not in df.columns or df[column].dtype not in ['int64', 'float64']:
+    if column not in df.columns or df[column].dtype not in ["int64", "float64"]:
         return None
 
     # Remove null values for plotting
@@ -246,22 +263,27 @@ def generate_boxplot(df, column):
     bp = ax.boxplot(data, patch_artist=True, notch=True)
 
     # Styling
-    bp['boxes'][0].set_facecolor('lightblue')
-    bp['boxes'][0].set_edgecolor('black')
-    bp['medians'][0].set_color('red')
-    bp['medians'][0].set_linewidth(2)
+    bp["boxes"][0].set_facecolor("lightblue")
+    bp["boxes"][0].set_edgecolor("black")
+    bp["medians"][0].set_color("red")
+    bp["medians"][0].set_linewidth(2)
 
     # Add styling
-    ax.set_title(f'Boxplot of {column}', fontsize=14, pad=20)
+    ax.set_title(f"Boxplot of {column}", fontsize=14, pad=20)
     ax.set_ylabel(column, fontsize=12)
-    ax.grid(True, alpha=0.3, axis='y')
+    ax.grid(True, alpha=0.3, axis="y")
 
     # Add statistics
     stats = data.describe()
-    stats_text = '.2f'
-    ax.text(0.02, 0.98, stats_text,
-            transform=ax.transAxes, verticalalignment='top',
-            bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+    stats_text = f"Min: {stats['min']:.2f}\nQ1: {stats['25%']:.2f}\nMedian: {stats['50%']:.2f}\nQ3: {stats['75%']:.2f}\nMax: {stats['max']:.2f}"
+    ax.text(
+        0.02,
+        0.98,
+        stats_text,
+        transform=ax.transAxes,
+        verticalalignment="top",
+        bbox=dict(boxstyle="round", facecolor="lightgreen", alpha=0.8),
+    )
 
     plt.tight_layout()
 
