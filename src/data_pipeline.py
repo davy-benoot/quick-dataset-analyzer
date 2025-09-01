@@ -275,7 +275,13 @@ def generate_boxplot(df, column):
 
     # Add statistics
     stats = data.describe()
-    stats_text = f"Min: {stats['min']:.2f}\nQ1: {stats['25%']:.2f}\nMedian: {stats['50%']:.2f}\nQ3: {stats['75%']:.2f}\nMax: {stats['max']:.2f}"
+    stats_text = (
+        f"Min: {stats['min']:.2f}\n"
+        f"Q1: {stats['25%']:.2f}\n"
+        f"Median: {stats['50%']:.2f}\n"
+        f"Q3: {stats['75%']:.2f}\n"
+        f"Max: {stats['max']:.2f}"
+    )
     ax.text(
         0.02,
         0.98,

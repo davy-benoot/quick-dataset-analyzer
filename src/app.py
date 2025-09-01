@@ -15,8 +15,7 @@ st.title("Quick Dataset Analyzer")
 # Get configurable max file size
 max_size_mb = get_max_file_size_mb()
 
-uploaded_file = st.file_uploader(f"Choose a CSV file (max {max_size_mb}MB)",
-                                 type="csv")
+uploaded_file = st.file_uploader(f"Choose a CSV file (max {max_size_mb}MB)", type="csv")
 
 if uploaded_file is not None:
     try:
@@ -63,8 +62,7 @@ if uploaded_file is not None:
         # Null Values Summary
         st.subheader("Null Values Summary")
         null_df = pd.DataFrame(
-            list(stats["null_counts"].items()),
-            columns=["Column", "Null Count"]
+            list(stats["null_counts"].items()), columns=["Column", "Null Count"]
         )
         null_df = null_df[null_df["Null Count"] > 0]  # Only show columns with nulls
         if not null_df.empty:
